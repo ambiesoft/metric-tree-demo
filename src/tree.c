@@ -35,14 +35,14 @@
 
 #include <stdint.h>
 #include <stdlib.h>
-#include <err.h>
+// #include <err.h>
 #include <time.h>
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
 
 #ifndef DO_PRINT
-#define DO_PRINT 0
+#define DO_PRINT 1
 #endif
 
 #ifndef HAVE_POPCNT
@@ -52,6 +52,16 @@
 static uint32_t rand_x0, rand_x1, rand_c;
 #define RAND_A 4284966893U
 
+static void
+errx(int n, char* p, ...)
+{
+    exit(1);
+}
+static void
+err(int n, char* p)
+{
+    exit(1);
+}
 void
 seedrand(void)
 {
@@ -119,7 +129,8 @@ distance(bkey_t x, bkey_t y)
     d = (d + (d >> 4)) & 0x0f0f0f0fU;
     d = d + (d >> 8);
     d = d + (d >> 16);
-    return d & 63;
+    d = d & 63;
+    return d;
 }
 
 #endif
@@ -455,6 +466,25 @@ query_vp(struct buf *restrict b, struct vptree *restrict root,
 
 typedef void *(*mktree_t)(bkey_t *, size_t, size_t);
 typedef size_t (*query_t)(struct buf *, void *, bkey_t, unsigned);
+
+/* "bk" is a BK-Tree. Each internal node has a center point, and each child node
+ *  contains a set of all points a certain distance away from the center.
+ *
+ * "vp" is a VP-Tree. Each internal node has a center point and two children.
+ * The "near" child contains all points contained in a closed ball of a certain
+ * radius around the center, and the "far" node contains all other points.
+ */
+
+
+/*
+MAXLIN NKEYS NQUERY DIST...
+
+bk 1000 100000000 1000 1 2 3 4 5
+bk 100 100000000 1000 6 7 8 9 10
+vp 1000 100000000 1000 1 2 3 4 5
+vp 100 100000000 1000 6 7 8 9 10
+linear 1000 100000000
+*/
 
 int main(int argc, char *argv[])
 {

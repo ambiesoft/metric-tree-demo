@@ -1,0 +1,5 @@
+MAXLIN=max linear:
+NKEYS=count of ramdon generated int32
+NQUERY=
+DIST... = distance < 32, 
+rootkey = keys[0]
