@@ -135,6 +135,18 @@ distance(bkey_t x, bkey_t y)
 
 #endif
 
+int distance_raw(bkey_t x, bkey_t y)
+{
+    uint32_t n = x^y;
+    int cnt=0;
+    while(n>0)
+    {
+        cnt+=(n&1);
+        n=n>>1;
+    }
+    return cnt;
+}
+
 static char keybuf[33];
 
 static const char *
@@ -477,13 +489,15 @@ typedef size_t (*query_t)(struct buf *, void *, bkey_t, unsigned);
 
 
 /*
-MAXLIN NKEYS NQUERY DIST...
+TYPE MAXLIN NKEYS NQUERY DIST...
+
+NKEY: keys are created as randum number
 
 bk 1000 100000000 1000 1 2 3 4 5
 bk 100 100000000 1000 6 7 8 9 10
 vp 1000 100000000 1000 1 2 3 4 5
 vp 100 100000000 1000 6 7 8 9 10
-linear 1000 100000000
+linear 1000 100000000 5
 */
 
 int main(int argc, char *argv[])
